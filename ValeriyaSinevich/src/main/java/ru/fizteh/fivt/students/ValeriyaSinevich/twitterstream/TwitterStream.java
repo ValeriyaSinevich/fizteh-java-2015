@@ -1,30 +1,91 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream;
 
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import com.beust.jcommander.JCommander;
+import twitter4j.*;
 
-import java.util.List;
-
-/**
- * Created by root on 9/26/15.
- */
 public class TwitterStream {
 
     public static void main(String[] args) {
-        // The factory instance is re-useable and thread safe.
-        Twitter twitter = TwitterFactory.getSingleton();
-        List<Status> statuses = null;
-        try {
-            statuses = twitter.getHomeTimeline();
-        } catch (TwitterException e) {
-            e.printStackTrace();
+        ParametersParser parser = new ParametersParser();
+        JCommander p1 = new JCommander(parser, args);
+
+        boolean help = parser.isHelp();
+
+        if (help) {
+            p1.usage();
+            return;
         }
-        System.out.println("Showing home timeline.");
-        for (Status status : statuses) {
-            System.out.println(status.getUser().getName() + ":"
-                    + status.getText());
+
+        if (parser.getSubstring().equals("") && parser.getPlace().equals("")) {
+            System.out.println("No parameters given, can't find everything in the world");
+        } else {
+            double[] coordinates = new double[2];
+
+            if (!parser.getPlace().equals("")) {
+                coordinates = Querist.findCoordinates(parser.getPlace());
+            } else {
+                coordinates = Querist.findCoordinatesByIp();
+            }
+            if (parser.isStream()) {
+                Querist.getTwitterStream(coordinates, parser, parser.getSubstring());
+            } else {
+                Querist.getTweets(coordinates, parser, parser.getSubstring());
+            }
+        }
+
+    }
+
+    public static void printTweet(Status tweet, ParametersParser parser, boolean stream, String substring) {
+        if (!substring.equals("")) {
+            if (!(tweet.getText().contains(substring))) {
+                return;
+            }
+        }
+        boolean isHide = parser.isHide();
+        if (!tweet.isRetweet()) {
+            if (!stream) {
+                System.out.println(TimeFormatter.formatTime(tweet.getCreatedAt())
+                        + " @"
+                        + tweet.getUser().getName()
+                        + " : "
+                        + tweet.getText()
+                        + " ");
+                if (tweet.isRetweeted()) {
+                    System.out.println(tweet.getRetweetCount());
+                }
+            } else {
+                System.out.println(" @"
+                        + tweet.getUser().getName()
+                        + " : "
+                        + tweet.getText()
+                        + " ");
+                if (tweet.isRetweeted()) {
+                    System.out.println(tweet.getRetweetCount());
+                }
+            }
+        } else if (!isHide) {
+            String text = tweet.getText();
+            String[] parts = text.split("RT");
+            parts = parts[1].split(":");
+
+            if (!stream) {
+                System.out.println(TimeFormatter.formatTime(tweet.getCreatedAt())
+                        + " @"
+                        + tweet.getUser().getName()
+                        + " retweeted @"
+                        + parts[0]
+                        + " "
+                        + parts[1]);
+
+            } else {
+                System.out.println(" @"
+                        + tweet.getUser().getName()
+                        + " retweeted @"
+                        + parts[1]
+                        + " "
+                        + tweet.getText());
+            }
         }
     }
+
 }
