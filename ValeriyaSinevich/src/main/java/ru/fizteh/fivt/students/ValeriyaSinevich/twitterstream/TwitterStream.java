@@ -15,24 +15,18 @@ public class TwitterStream {
             p1.usage();
             return;
         }
-
-        if (parser.getSubstring().equals("") && parser.getPlace().equals("")) {
-            System.out.println("No parameters given, can't find everything in the world");
-        } else {
             double[] coordinates;
 
-            if (!parser.getPlace().equals("")) {
-                coordinates = Querist.findCoordinates(parser.getPlace());
-            } else {
+            if (parser.getPlace().equals("") || parser.getPlace().equals("nearby")) {
                 coordinates = Querist.findCoordinatesByIp();
+            } else {
+                coordinates = Querist.findCoordinates(parser.getPlace());
             }
             if (parser.isStream()) {
                 Querist.getTwitterStream(coordinates, parser, parser.getSubstring());
             } else {
                 Querist.getTweets(coordinates, parser, parser.getSubstring());
             }
-        }
-
     }
 
     public static void printTweet(Status tweet, ParametersParser parser, boolean stream, String substring) {

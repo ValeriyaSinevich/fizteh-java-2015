@@ -40,7 +40,7 @@ public class Querist {
                 org.apache.commons.io.IOUtils.copy(conn.getInputStream(), output);
                 output.close();
                 String result = output.toString();
-                System.out.println(result);
+                //System.out.println(result);
                 twitter4j.JSONObject myGeoLocation = new twitter4j.JSONObject(result);
 
                 /*String myGeoLocationAddr = myGeoLocation.getString("City")
