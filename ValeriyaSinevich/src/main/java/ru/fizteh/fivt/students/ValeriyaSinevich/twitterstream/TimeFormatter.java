@@ -23,21 +23,28 @@ public class TimeFormatter {
         Date date = new Date();
         String timeNow = dateFormat.format(date);
         String timeTweet = dateFormat.format(time);
-        String[] dayTimeNow = timeNow.toString().split(" ");
-        String[] dayTimeTweet = timeTweet.toString().split(" ");
+        String[] dayTimeNow = timeNow.split(" ");
+        String[] dayTimeTweet = timeTweet.split(" ");
 
-        if (Integer.parseInt(dayTimeNow[YEAR]) == Integer.parseInt(dayTimeTweet[YEAR]) && Integer.parseInt(dayTimeNow[DAY]) == Integer.parseInt(dayTimeTweet[DAY])) {
-            int seconds = (Integer.parseInt(dayTimeNow[HOUR]) - Integer.parseInt(dayTimeTweet[HOUR])) * MINUTES * SECONDS
-                    + (Integer.parseInt(dayTimeNow[MINUTE]) - Integer.parseInt(dayTimeTweet[MINUTE])) * SECONDS
-                    + (Integer.parseInt(dayTimeNow[SECOND]) - Integer.parseInt(dayTimeTweet[SECOND]));
+        if (Integer.parseInt(dayTimeNow[YEAR]) == Integer.parseInt(dayTimeTweet[YEAR])
+                && Integer.parseInt(dayTimeNow[DAY]) == Integer.parseInt(dayTimeTweet[DAY])) {
+            int seconds = (Integer.parseInt(dayTimeNow[HOUR])
+                    - Integer.parseInt(dayTimeTweet[HOUR])) * MINUTES * SECONDS
+                    + (Integer.parseInt(dayTimeNow[MINUTE])
+                    - Integer.parseInt(dayTimeTweet[MINUTE])) * SECONDS
+                    + (Integer.parseInt(dayTimeNow[SECOND])
+                    - Integer.parseInt(dayTimeTweet[SECOND]));
                 if (seconds <= 2 * MINUTES) {
                     return "Just now";
                 } else if (seconds <= MINUTES * SECONDS) {
                     return "An hour ago";
                 } else {
-                    return Integer.toString(Integer.parseInt(dayTimeNow[HOUR]) - Integer.parseInt(dayTimeTweet[HOUR])) + " hours ago";
+                    return Integer.toString(Integer.parseInt(dayTimeNow[HOUR])
+                            - Integer.parseInt(dayTimeTweet[HOUR]))
+                            + " hours ago";
                 }
-            } else if (Integer.parseInt(dayTimeNow[YEAR]) == Integer.parseInt(dayTimeTweet[YEAR]) && Integer.parseInt(dayTimeNow[DAY]) - 1 == Integer.parseInt(dayTimeTweet[DAY])) {
+            } else if (Integer.parseInt(dayTimeNow[YEAR]) == Integer.parseInt(dayTimeTweet[YEAR])
+                && Integer.parseInt(dayTimeNow[DAY]) - 1 == Integer.parseInt(dayTimeTweet[DAY])) {
                 return "yesterday";
             } else {
             int days = (Integer.parseInt(dayTimeNow[YEAR]) - Integer.parseInt(dayTimeTweet[1])) * DAYS

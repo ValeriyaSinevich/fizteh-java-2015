@@ -126,7 +126,7 @@ public class Querist {
         twitterStream.filter(tweetFilterQuery);
     }
 
-    public static void getTweets(double[] coordinates, ParametersParser parser, String substring){
+    public static void getTweets(double[] coordinates, ParametersParser parser, String substring) {
         Twitter twitter = TwitterFactory.getSingleton();
 
         String radiusUnit = "km";

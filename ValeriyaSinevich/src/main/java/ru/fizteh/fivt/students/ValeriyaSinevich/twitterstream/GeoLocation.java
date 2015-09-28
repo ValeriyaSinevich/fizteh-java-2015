@@ -1,8 +1,5 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream;
 
-/**
- * Created by root on 9/27/15.
- */
 public final class GeoLocation {
 
     private double radLat;  // latitude in radians
@@ -48,19 +45,16 @@ public final class GeoLocation {
     }
 
     private void checkBounds() {
-        if (radLat < MIN_LAT || radLat > MAX_LAT ||
-                radLon < MIN_LON || radLon > MAX_LON)
+        if (radLat < MIN_LAT || radLat > MAX_LAT
+                || radLon < MIN_LON || radLon > MAX_LON) {
             throw new IllegalArgumentException();
+        }
     }
-    public double distanceTo(GeoLocation location, double radius) {
-        return Math.acos(Math.sin(radLat) * Math.sin(location.radLat) +
-                Math.cos(radLat) * Math.cos(location.radLat) *
-                        Math.cos(radLon - location.radLon)) * radius;
-    }
-    public GeoLocation[] boundingCoordinates(double distance, double radius) {
 
-        if (radius < 0d || distance < 0d)
+    public GeoLocation[] boundingCoordinates(double distance, double radius) {
+        if (radius < 0d || distance < 0d) {
             throw new IllegalArgumentException();
+        }
 
         // angular distance in radians on a great circle
         double radDist = distance / radius;
@@ -70,12 +64,16 @@ public final class GeoLocation {
 
         double minLon, maxLon;
         if (minLat > MIN_LAT && maxLat < MAX_LAT) {
-            double deltaLon = Math.asin(Math.sin(radDist) /
-                    Math.cos(radLat));
+            double deltaLon = Math.asin(Math.sin(radDist)
+                    / Math.cos(radLat));
             minLon = radLon - deltaLon;
-            if (minLon < MIN_LON) minLon += 2d * Math.PI;
+            if (minLon < MIN_LON) {
+                minLon += 2d * Math.PI;
+            }
             maxLon = radLon + deltaLon;
-            if (maxLon > MAX_LON) maxLon -= 2d * Math.PI;
+            if (maxLon > MAX_LON) {
+                maxLon -= 2d * Math.PI;
+            }
         } else {
             // a pole is within the distance
             minLat = Math.max(minLat, MIN_LAT);

@@ -19,7 +19,7 @@ public class TwitterStream {
         if (parser.getSubstring().equals("") && parser.getPlace().equals("")) {
             System.out.println("No parameters given, can't find everything in the world");
         } else {
-            double[] coordinates = new double[2];
+            double[] coordinates;
 
             if (!parser.getPlace().equals("")) {
                 coordinates = Querist.findCoordinates(parser.getPlace());
