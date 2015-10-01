@@ -113,7 +113,7 @@ public class Querist {
 
             @Override
             public void onStatus(Status status) {
-                TwitterStream.printTweet(status, parser, true, substring);
+                Printer.printTweet(status, parser, true, substring);
             }
 
             @Override
@@ -148,7 +148,7 @@ public class Querist {
                 int i;
                 for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
                     Status tweet = tweets.get(i);
-                    TwitterStream.printTweet(tweet, parser, false, substring);
+                    Printer.printTweet(tweet, parser, false, substring);
                 }
                 if (i == Integer.min(limits, tweets.size())) {
                     break;

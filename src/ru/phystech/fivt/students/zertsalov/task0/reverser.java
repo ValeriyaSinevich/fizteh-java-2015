@@ -1,7 +1,7 @@
 package ru.phystech.fivt.students.zertsalov.task0;
 
 /**
- * task0 ru.fizteh.fivt.students.ValeriyaSinevich.reverser
+ * task0 reverser
  * Created by User on 14.09.2015.
  */
 
