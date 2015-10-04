@@ -14,17 +14,32 @@ public class TwitterStream {
             p1.usage();
             return;
         }
-            double[] coordinates;
+        double[] coordinates;
 
-            if (parser.getPlace().equals("") || parser.getPlace().equals("nearby")) {
+        if (parser.getPlace().equals("") || parser.getPlace().equals("nearby")) {
+            try {
                 coordinates = Querist.findCoordinatesByIp();
-            } else {
+            } catch (LocationException ex) {
+                System.err.println(ex.getMessage());
+                return;
+            }
+        } else {
+            try {
                 coordinates = Querist.findCoordinates(parser.getPlace());
+            } catch (LocationException | PropertiesException ex) {
+                System.err.println(ex.getMessage());
+                return;
             }
-            if (parser.isStream()) {
-                Querist.getTwitterStream(coordinates, parser, parser.getSubstring());
-            } else {
+        }
+        if (parser.isStream()) {
+            Querist.getTwitterStream(coordinates, parser, parser.getSubstring());
+        } else {
+            try {
                 Querist.getTweets(coordinates, parser, parser.getSubstring());
+            } catch (GetTweetException ex) {
+                System.err.println(ex.getMessage());
+                return;
             }
+        }
     }
 }

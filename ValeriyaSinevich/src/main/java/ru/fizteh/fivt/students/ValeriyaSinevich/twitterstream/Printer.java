@@ -11,6 +11,12 @@ public class Printer {
             }
         }
         boolean isHide = parser.isHide();
+
+
+
+
+
+
         if (!tweet.isRetweet()) {
             if (!stream) {
                 System.out.println(TimeFormatter.formatTime(tweet.getCreatedAt())
@@ -23,7 +29,7 @@ public class Printer {
                     System.out.println(tweet.getRetweetCount());
                 }
             } else {
-                System.out.println(" @"
+                System.out.println("@"
                         + tweet.getUser().getName()
                         + " : "
                         + tweet.getText()
@@ -47,7 +53,7 @@ public class Printer {
                         + parts[1]);
 
             } else {
-                System.out.println(" @"
+                System.out.println("@"
                         + tweet.getUser().getName()
                         + " retweeted"
                         + parts[1]
