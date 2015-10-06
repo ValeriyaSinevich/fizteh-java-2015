@@ -12,53 +12,28 @@ public class Printer {
         }
         boolean isHide = parser.isHide();
 
+        String result = new String();
 
-
-
-
-
-        if (!tweet.isRetweet()) {
+        if (!tweet.isRetweet() || !isHide) {
             if (!stream) {
-                System.out.println(TimeFormatter.formatTime(tweet.getCreatedAt())
-                        + " @"
-                        + tweet.getUser().getName()
-                        + " : "
-                        + tweet.getText()
-                        + " ");
-                if (tweet.isRetweeted()) {
-                    System.out.println(tweet.getRetweetCount());
-                }
-            } else {
-                System.out.println("@"
-                        + tweet.getUser().getName()
-                        + " : "
-                        + tweet.getText()
-                        + " ");
-                if (tweet.isRetweeted()) {
-                    System.out.println(tweet.getRetweetCount());
-                }
+                result.concat(TimeFormatter.formatTime(tweet.getCreatedAt()) + " ");
             }
-        } else if (!isHide) {
-            String text = tweet.getText();
-            String[] parts = text.split("RT");
-            parts = parts[1].split(":");
-
-            if (!stream) {
-                System.out.println(TimeFormatter.formatTime(tweet.getCreatedAt())
-                        + " @"
-                        + tweet.getUser().getName()
-                        + " retweeted"
+            result.concat("@"
+                    + tweet.getUser().getName());
+            if (tweet.isRetweet()){
+                String text = tweet.getText();
+                String[] parts = text.split("RT");
+                parts = parts[1].split(":");
+                result.concat(" retweeted "
                         + parts[0]
-                        + " "
+                        + ": "
                         + parts[1]);
-
             } else {
-                System.out.println("@"
-                        + tweet.getUser().getName()
-                        + " retweeted"
-                        + parts[1]
-                        + " "
+                result.concat(" : "
                         + tweet.getText());
+            }
+            if (tweet.isRetweeted()) {
+                result.concat(Integer.toString(tweet.getRetweetCount()));
             }
         }
         System.out.println();
