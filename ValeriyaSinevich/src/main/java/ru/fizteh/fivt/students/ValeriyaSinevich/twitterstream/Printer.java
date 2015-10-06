@@ -20,7 +20,7 @@ public class Printer {
             }
             result.append("@"
                     + tweet.getUser().getName());
-            if (tweet.isRetweet()){
+            if (tweet.isRetweet()) {
                 String text = tweet.getText();
                 String[] parts = text.split("RT");
                 parts = parts[1].split(":");
