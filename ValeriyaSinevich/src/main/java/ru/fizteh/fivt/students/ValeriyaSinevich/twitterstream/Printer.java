@@ -12,31 +12,31 @@ public class Printer {
         }
         boolean isHide = parser.isHide();
 
-        String result = new String();
+        StringBuilder result = new StringBuilder();
 
         if (!tweet.isRetweet() || !isHide) {
             if (!stream) {
-                result.concat(TimeFormatter.formatTime(tweet.getCreatedAt()) + " ");
+                result.append(TimeFormatter.formatTime(tweet.getCreatedAt()) + " ");
             }
-            result.concat("@"
+            result.append("@"
                     + tweet.getUser().getName());
             if (tweet.isRetweet()){
                 String text = tweet.getText();
                 String[] parts = text.split("RT");
                 parts = parts[1].split(":");
-                result.concat(" retweeted "
+                result.append(" retweeted "
                         + parts[0]
                         + ": "
                         + parts[1]);
             } else {
-                result.concat(" : "
+                result.append(" : "
                         + tweet.getText());
             }
             if (tweet.isRetweeted()) {
-                result.concat(Integer.toString(tweet.getRetweetCount()));
+                result.append(Integer.toString(tweet.getRetweetCount()));
             }
         }
-        System.out.println();
+        System.out.println(result);
     }
 
 }
