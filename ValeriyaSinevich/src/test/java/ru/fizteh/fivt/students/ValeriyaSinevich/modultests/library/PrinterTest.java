@@ -19,22 +19,21 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrinterTest {
+    private static final int TEST_COUNT = 5;
+
     @Before
     public void setUp() throws Exception {
         ParametersParser parser = mock(ParametersParser.class);
-        Status tweet = mock(Status.class);
-        List<Status> = mock(List.class);
 
-        when(translator.translateMinutes()).thenReturn(statuses);
+        for (int i = 0; i < TEST_COUNT; ++i) {
+            Status tweet = mock(Status.class);
+            when(tweet.getUser()).thenReturn()
+        }
+
 
         when(twitter.search(argThat(hasProperty("query", equalTo("java")))))
                 .thenReturn(queryResult);
 
-        QueryResult emptyQueryResult = mock(QueryResult.class);
-        when(emptyQueryResult.getTweets()).thenReturn(Collections.emptyList());
-
-        when(twitter.search(argThat(hasProperty("query", not(equalTo("java"))))))
-                .thenReturn(emptyQueryResult);
     }
 
 

@@ -15,17 +15,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
 
-/**
- * Example unit tests for tweets retrieval service with mocking
- * <p>
- * Created by kormushin on 29.09.15.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class TwitterServiceImplTest {
 
