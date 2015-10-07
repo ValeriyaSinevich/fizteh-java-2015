@@ -1,50 +1,69 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
-import twitter4j.QueryResult;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RussianTest {
 
-    @Before
-    public void setUp() throws Exception {
-        Russian translator = mock(Russian.class);
-
-        when(translator.translateMinutes()).thenReturn(statuses);
-
-        when(twitter.search(argThat(hasProperty("query", equalTo("java")))))
-                .thenReturn(queryResult);
-
-        QueryResult emptyQueryResult = mock(QueryResult.class);
-        when(emptyQueryResult.getTweets()).thenReturn(Collections.emptyList());
-
-        when(twitter.search(argThat(hasProperty("query", not(equalTo("java"))))))
-                .thenReturn(emptyQueryResult);
-    }
+    private static final int TEST_COUNT = 6;
 
     @Test
     public void testTranslateMinutes() throws Exception {
+        List<String> ans = new ArrayList<String>(0);
 
+        long[] diff = {1, 22, 11, 14, 51, 66};
+
+        ans.add(" минуту");
+        ans.add(" минуты");
+        ans.add(" минут");
+        ans.add(" минут");
+        ans.add(" минуту");
+        ans.add(" минут");
+
+        for (int i = 0; i < TEST_COUNT; ++i) {
+            String result = Russian.translateMinutes(diff[i]);
+            assertThat(result, is(ans.get(i)));
+        }
     }
 
     @Test
     public void testTranslateHours() throws Exception {
+        List<String> ans = new ArrayList<String>(0);
+        long[] diff = {1, 22, 11, 14, 51, 66};
 
+        ans.add(" час");
+        ans.add(" часа");
+        ans.add(" часов");
+        ans.add(" часов");
+        ans.add(" час");
+        ans.add(" часов");
+
+        for (int i = 0; i < TEST_COUNT; ++i) {
+            String result = Russian.translateHours(diff[i]);
+            assertThat(result, is(ans.get(i)));
+        }
     }
 
     @Test
     public void testTranslateDays() throws Exception {
+        List<String> ans = new ArrayList<String>(0);
+        long[] diff = {1, 22, 11, 14, 51, 66};
 
+        ans.add(" день");
+        ans.add(" дня");
+        ans.add(" дней");
+        ans.add(" дней");
+        ans.add(" день");
+        ans.add(" дней");
+
+        for (int i = 0; i < TEST_COUNT; ++i) {
+            String result = Russian.translateDays(diff[i]);
+            assertThat(result, is(ans.get(i)));
+        }
     }
 }

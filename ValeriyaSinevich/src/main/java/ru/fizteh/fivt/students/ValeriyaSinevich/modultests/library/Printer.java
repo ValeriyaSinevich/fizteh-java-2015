@@ -5,6 +5,7 @@ import twitter4j.Status;
 
 public class Printer {
     public static String printTweet(Status tweet, ParametersParser parser, boolean stream, String substring) {
+        Now now = new Now();
         if (!substring.equals("")) {
             if (!(tweet.getText().contains(substring))) {
                 return "";
@@ -16,7 +17,7 @@ public class Printer {
 
         if (!tweet.isRetweet() || !isHide) {
             if (!stream) {
-                result.append(TimeFormatter.formatTime(tweet.getCreatedAt()) + " ");
+                result.append(TimeFormatter.formatTime(tweet.getCreatedAt(), now) + " ");
             }
             result.append("@"
                     + tweet.getUser().getName());

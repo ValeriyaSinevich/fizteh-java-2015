@@ -13,7 +13,7 @@ public class Russian {
                 || diff % DECADE > SECOND_FORM_BOUND) {
             return " минут";
         } else if (diff % DECADE == FIRST_FORM_BOUND && diff % CHECK != EXCEPTION) {
-            return " минутy";
+            return " минуту";
         } else {
             return " минуты";
         }

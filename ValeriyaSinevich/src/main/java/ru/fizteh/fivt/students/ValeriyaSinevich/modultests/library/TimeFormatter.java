@@ -22,14 +22,14 @@ public class TimeFormatter {
     private static final int MINUTE = 3;
     private static final int SECOND = 4;*/
 
-    public static String formatTime(Date time) {
+    public static String formatTime(Date time, Now now) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         String timeTweet = dateFormat.format(time);
 
-        LocalDateTime tNow = LocalDateTime.now();
+        LocalDateTime tNow = now.getTime();
         LocalDateTime tTweet = LocalDateTime.parse(timeTweet, format);
 
         if (ChronoUnit.DAYS.between(tTweet, tNow) < 1) {
