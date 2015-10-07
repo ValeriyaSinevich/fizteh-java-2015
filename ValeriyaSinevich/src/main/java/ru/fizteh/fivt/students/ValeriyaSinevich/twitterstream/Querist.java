@@ -2,7 +2,13 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream;
 
 //import org.apache.http.client.methods.HttpPost;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.json.DataObjectFactory;
 
 import java.io.ByteArrayOutputStream;
 
@@ -132,7 +138,10 @@ public class Querist {
 
     public static void getTweets(double[] coordinates, ParametersParser parser, String substring)
             throws GetTweetException {
-        Twitter twitter = TwitterFactory.getSingleton();
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setJSONStoreEnabled(true);
+
+        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
 
         String radiusUnit = "km";
         final double distance = 5;
@@ -153,7 +162,16 @@ public class Querist {
                 int i;
                 for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
                     Status tweet = tweets.get(i);
-                    Printer.printTweet(tweet, parser, false, substring);
+                    if (!tweet.isRetweet()) {
+                        continue;
+                    }
+                    String json = DataObjectFactory.getRawJSON(tweet);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    JsonParser jp = new JsonParser();
+                    JsonElement je = jp.parse(json);
+                    String prettyJsonString = gson.toJson(je);
+                    System.out.println(prettyJsonString);
+                    //Printer.printTweet(tweet, parser, false, substring);
                 }
                 if (i == Integer.min(limits, tweets.size())) {
                     break;
