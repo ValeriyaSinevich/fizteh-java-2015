@@ -1,7 +1,5 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.*;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.PropertiesException;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -18,4 +16,3 @@ public class PropertiesLoader {
         }
     }
 }
-

@@ -20,8 +20,8 @@ public final class GeoLocation {
      * @param latitude the latitude, in degrees.
      * @param longitude the longitude, in degrees.
      */
-    public static ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation fromDegrees(double latitude, double longitude) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation();
+    public static ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation fromDegrees(double latitude, double longitude) {
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
         result.radLat = Math.toRadians(latitude);
         result.radLon = Math.toRadians(longitude);
         result.degLat = latitude;
@@ -34,8 +34,8 @@ public final class GeoLocation {
      * @param latitude the latitude, in radians.
      * @param longitude the longitude, in radians.
      */
-    public static ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation fromRadians(double latitude, double longitude) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation();
+    public static ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation fromRadians(double latitude, double longitude) {
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
         result.radLat = latitude;
         result.radLon = longitude;
         result.degLat = Math.toDegrees(latitude);
@@ -51,7 +51,7 @@ public final class GeoLocation {
         }
     }
 
-    public ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation[] boundingCoordinates(double distance, double radius) {
+    public ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] boundingCoordinates(double distance, double radius) {
         if (radius < 0d || distance < 0d) {
             throw new IllegalArgumentException();
         }
@@ -82,7 +82,7 @@ public final class GeoLocation {
             maxLon = MAX_LON;
         }
 
-        return new ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation[]{fromRadians(minLat, minLon),
+        return new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[]{fromRadians(minLat, minLon),
                 fromRadians(maxLat, maxLon)};
     }
 

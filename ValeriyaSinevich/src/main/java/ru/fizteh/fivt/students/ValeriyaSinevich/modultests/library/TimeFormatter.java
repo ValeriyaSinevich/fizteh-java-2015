@@ -38,13 +38,13 @@ public class TimeFormatter {
                     return "Just now";
                 } else {
                     long timeUnitsAgo = ChronoUnit.MINUTES.between(tTweet, tNow);
-                    return Long.toString(timeUnitsAgo) + ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.Russian.translateMinutes(timeUnitsAgo) + " назад";
+                    return Long.toString(timeUnitsAgo) + Russian.translateMinutes(timeUnitsAgo) + " назад";
                 }
             } else if (ChronoUnit.HOURS.between(tTweet, tNow) < 2) {
                 return "an hour ago";
             } else {
                 long timeUnitsAgo = ChronoUnit.HOURS.between(tTweet, tNow);
-                return  Long.toString(timeUnitsAgo) + ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.Russian.translateHours(timeUnitsAgo) + " назад";
+                return  Long.toString(timeUnitsAgo) + Russian.translateHours(timeUnitsAgo) + " назад";
             }
         } else if (ChronoUnit.DAYS.between(tTweet, tNow) < 2) {
             return "yesterday";

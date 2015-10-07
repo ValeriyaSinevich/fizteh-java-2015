@@ -2,11 +2,7 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
 //import org.apache.http.client.methods.HttpPost;
 
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.*;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GetTweetException;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.ParametersParser;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.Printer;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.PropertiesException;
+import ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException;
 import twitter4j.*;
 import twitter4j.GeoLocation;
 import twitter4j.TwitterStream;
@@ -23,10 +19,11 @@ public class Querist {
     private static final int MAX_BYTE_STREAM = 1024;
 
     public static double[][] createBox(double lat, double lon) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation point = ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation.fromDegrees(lat, lon);
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation point
+                = ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation.fromDegrees(lat, lon);
         final double radius = 6371.01;
         final double distance = 5;
-        ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.GeoLocation[] borders = point.boundingCoordinates(distance, radius);
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] borders = point.boundingCoordinates(distance, radius);
         double[][] boundingBox = new double[2][2];
         boundingBox[0][0] = borders[0].getLongitudeInDegrees();
         boundingBox[0][1] = borders[0].getLatitudeInDegrees();
@@ -38,37 +35,38 @@ public class Querist {
     public static double[] findCoordinatesByIp() throws LocationException {
         double lat;
         double lon;
-            try {
-                URL geoIpUrl = new URL("http://ipinfo.io/json");
-                URLConnection conn = geoIpUrl.openConnection();
-                try (ByteArrayOutputStream output = new ByteArrayOutputStream(MAX_BYTE_STREAM)) {
-                    org.apache.commons.io.IOUtils.copy(conn.getInputStream(), output);
-                    output.close();
-                    String result = output.toString();
-                    //System.out.println(result);
-                    JSONObject myGeoLocation = new JSONObject(result);
+        try {
+            URL geoIpUrl = new URL("http://ipinfo.io/json");
+            URLConnection conn = geoIpUrl.openConnection();
+            try (ByteArrayOutputStream output = new ByteArrayOutputStream(MAX_BYTE_STREAM)) {
+                org.apache.commons.io.IOUtils.copy(conn.getInputStream(), output);
+                output.close();
+                String result = output.toString();
+                //System.out.println(result);
+                JSONObject myGeoLocation = new JSONObject(result);
 
                     /*String myGeoLocationAddr = myGeoLocation.getString("City")
                             + ", "
                             + myGeoLocation.getString("region")
                             + ", "
                             + myGeoLocation.getString("country");*/
-                    String[] loc = myGeoLocation.getString("loc").split(",");
-                    //System.out.printf(loc[0]);
-                    lat = Double.parseDouble(loc[0]);
-                    lon = Double.parseDouble(loc[1]);
-                } catch (Exception ex) {
-                    throw new LocationException(ex.getMessage());
-                }
-
+                String[] loc = myGeoLocation.getString("loc").split(",");
+                //System.out.printf(loc[0]);
+                lat = Double.parseDouble(loc[0]);
+                lon = Double.parseDouble(loc[1]);
             } catch (Exception ex) {
                 throw new LocationException(ex.getMessage());
             }
+
+        } catch (Exception ex) {
+            throw new LocationException(ex.getMessage());
+        }
         double[] coordinates = new double[]{lat, lon};
         return coordinates;
     }
 
-    public static double[] findCoordinates(String name) throws LocationException, PropertiesException {
+    public static double[] findCoordinates(String name) throws LocationException,
+            ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException {
         double lat, lon;
         String key;
 
@@ -78,8 +76,8 @@ public class Querist {
             PropertiesLoader prop = new PropertiesLoader();
             try {
                 key = "&key=" + prop.loadKey().split("\"")[1];
-            } catch (PropertiesException e) {
-                throw new PropertiesException(e.getMessage());
+            } catch (ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException e) {
+                throw new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException(e.getMessage());
             }
             String query = "https://maps.googleapis.com/maps/api/geocode/json?address=";
             String finalQuery = query + name + key;
@@ -114,7 +112,7 @@ public class Querist {
         return new double[]{lat, lon};
     }
 
-    public static void getTwitterStream(double[] coordinates, ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.ParametersParser parser, String substring) {
+    public static void getTwitterStream(double[] coordinates, ParametersParser parser, String substring) {
         FilterQuery tweetFilterQuery = new FilterQuery();
         double[][] boundingBox = createBox(coordinates[0], coordinates[1]);
         tweetFilterQuery.locations(boundingBox);
@@ -137,7 +135,7 @@ public class Querist {
         twitterStream.filter(tweetFilterQuery);
     }
 
-    public static void getTweets(double[] coordinates, ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.ParametersParser parser, String substring)
+    public static String getTweets(double[] coordinates, ParametersParser parser, String substring)
             throws GetTweetException {
         Twitter twitter = TwitterFactory.getSingleton();
 
@@ -160,7 +158,7 @@ public class Querist {
                 int i;
                 for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
                     Status tweet = tweets.get(i);
-                    Printer.printTweet(tweet, parser, false, substring);
+                    return Printer.printTweet(tweet, parser, false, substring);
                 }
                 if (i == Integer.min(limits, tweets.size())) {
                     break;
@@ -176,7 +174,7 @@ public class Querist {
         if (count  == 0) {
             throw new GetTweetException("Internet connection is not available");
         }
+        return "";
     }
-
 
 }

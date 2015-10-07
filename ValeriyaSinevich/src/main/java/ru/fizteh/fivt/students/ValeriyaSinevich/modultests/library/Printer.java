@@ -1,15 +1,13 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
 
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.*;
-import ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.ParametersParser;
 import twitter4j.Status;
 
 public class Printer {
-    public static void printTweet(Status tweet, ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream.ParametersParser parser, boolean stream, String substring) {
+    public static String printTweet(Status tweet, ParametersParser parser, boolean stream, String substring) {
         if (!substring.equals("")) {
             if (!(tweet.getText().contains(substring))) {
-                return;
+                return "";
             }
         }
         boolean isHide = parser.isHide();
@@ -38,7 +36,7 @@ public class Printer {
                 result.append(Integer.toString(tweet.getRetweetCount()));
             }
         }
-        System.out.println(result);
+        return result.toString();
     }
 
 }
