@@ -57,8 +57,7 @@ public class QueristTest {
         QueryResult emptyQueryResult = mock(QueryResult.class);
         when(emptyQueryResult.getTweets()).thenReturn(Collections.emptyList());
 
-        when(twitter.search(argThat(hasProperty("query", not(equalTo("java"))))))
-                .thenReturn(emptyQueryResult);
+
     }
 
     private QueryResult mock(Class<QueryResult> queryResultClass) {

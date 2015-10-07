@@ -2,7 +2,12 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.twitterstream;
 
 //import org.apache.http.client.methods.HttpPost;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import twitter4j.*;
+import twitter4j.json.DataObjectFactory;
 
 import java.io.ByteArrayOutputStream;
 
@@ -153,6 +158,12 @@ public class Querist {
                 int i;
                 for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
                     Status tweet = tweets.get(i);
+                    String json = DataObjectFactory.getRawJSON(tweet);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    JsonParser jp = new JsonParser();
+                    JsonElement je = jp.parse(json);
+                    String prettyJsonString = gson.toJson(je);
+                    System.out.println(prettyJsonString);
                     Printer.printTweet(tweet, parser, false, substring);
                 }
                 if (i == Integer.min(limits, tweets.size())) {
