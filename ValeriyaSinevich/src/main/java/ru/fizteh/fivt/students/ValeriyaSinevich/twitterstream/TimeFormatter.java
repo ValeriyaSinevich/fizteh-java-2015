@@ -35,19 +35,19 @@ public class TimeFormatter {
                     return "Just now";
                 } else {
                     long timeUnitsAgo = ChronoUnit.MINUTES.between(tTweet, tNow);
-                    return Long.toString(timeUnitsAgo) + Russian.translateMinutes(timeUnitsAgo) + " назад";
+                    return Long.toString(timeUnitsAgo) + Russian.translate(timeUnitsAgo, "m") + " назад";
                 }
             } else if (ChronoUnit.HOURS.between(tTweet, tNow) < 2) {
                 return "an hour ago";
             } else {
                 long timeUnitsAgo = ChronoUnit.HOURS.between(tTweet, tNow);
-                return  Long.toString(timeUnitsAgo) + Russian.translateHours(timeUnitsAgo) + " назад";
+                return  Long.toString(timeUnitsAgo) + Russian.translate(timeUnitsAgo, "h") + " назад";
             }
         } else if (ChronoUnit.DAYS.between(tTweet, tNow) < 2) {
             return "yesterday";
         } else {
             long timeUnitsAgo = ChronoUnit.DAYS.between(tTweet, tNow);
-            return Long.toString(timeUnitsAgo) + Russian.translateDays(timeUnitsAgo) + " назад";
+            return Long.toString(timeUnitsAgo) + Russian.translate(timeUnitsAgo, "d") + " назад";
         }
     }
 
