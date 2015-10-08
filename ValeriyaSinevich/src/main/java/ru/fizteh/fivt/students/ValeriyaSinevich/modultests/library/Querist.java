@@ -2,7 +2,6 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
 //import org.apache.http.client.methods.HttpPost;
 
-import ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException;
 import twitter4j.*;
 import twitter4j.GeoLocation;
 import twitter4j.TwitterStream;
@@ -23,7 +22,8 @@ public class Querist {
                 = ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation.fromDegrees(lat, lon);
         final double radius = 6371.01;
         final double distance = 5;
-        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] borders = point.boundingCoordinates(distance, radius);
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] borders
+                = point.boundingCoordinates(distance, radius);
         double[][] boundingBox = new double[2][2];
         boundingBox[0][0] = borders[0].getLongitudeInDegrees();
         boundingBox[0][1] = borders[0].getLatitudeInDegrees();

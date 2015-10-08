@@ -10,9 +10,13 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import twitter4j.QueryResult;
 import twitter4j.Status;
+import twitter4j.User;
 
 import java.io.FileReader;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -30,10 +34,9 @@ public class PrinterTest {
         JSONParser parser = new JSONParser();
         try {
             try (InputStream inputStream
-                         = Thread.currentThread().getContextClassLoader().getResourceAsStream("/tweetExamples.json")) {
+                         = this.getClass().getResourceAsStream("/tweetExamples.json")) {
                 String theString = IOUtils.toString(inputStream, "UTF-8");
-                Object obj = parser.parse(theString);
-                JSONArray tweets = (JSONArray)obj;
+                JSONArray tweets = new JSONArray(theString);
                 return tweets.getJSONObject(i);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -51,22 +54,33 @@ public class PrinterTest {
         ParametersParser parser = mock(ParametersParser.class);
         Status tweet = mock(Status.class);
 
+        Date tTweet = mock(Date.class);
+        DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss Z yyyy");
+
+        User user = mock(User.class);
+
        boolean isRetweet;
 
         for (int i = 0; i < TEST_COUNT; ++i) {
 
             switch (i) {
                 case 0:
-                    String user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
+                    when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
                     String CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    Date date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    isRetweet = tweetFromFile(0).has("retweet_status");
-                    when(tweet.isRetweet()).thenReturn(isRetweet);
+                    String usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
 
-                    int retweeted = Integer.parseInt(tweetFromFile(0).getString("retweet_count"));
+                    String text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    int retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
@@ -77,16 +91,22 @@ public class PrinterTest {
                     break;
 
                 case 1:
-                    user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
+                    CreatedAt = tweetFromFile(1).getString("created_at");
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    usr = tweetFromFile(1).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
 
-                    isRetweet = tweetFromFile(0).has("retweet_status");
+                    text = tweetFromFile(1).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(1).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(true);
 
-                    retweeted = Integer.parseInt(tweetFromFile(0).getString("retweeted"));
+                    retweeted = tweetFromFile(1).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
@@ -97,123 +117,160 @@ public class PrinterTest {
                     break;
 
                 case 2:
-                    user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
-
                     CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    isRetweet = tweetFromFile(0).has("retweet_status");
+                    usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
+
+                    text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(0).getString("retweeted"));
+                    retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, true, "");
-                    assertThat(result, is(""));
+                    assertThat(result, is("@MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
 
                 case 3:
-                    user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
-
                     CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    isRetweet = tweetFromFile(0).has("retweet_status");
+                    usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
+
+                    text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(0).getString("retweeted"));
+                    retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is(""));
+                    assertThat(result,
+                            is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
 
                 case 4:
 
-                    user = tweetFromFile(2).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
+                    CreatedAt = tweetFromFile(0).getString("created_at");
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    CreatedAt = tweetFromFile(2).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
 
-                    isRetweet = tweetFromFile(0).has("retweet_status");
+                    text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(2).getString("retweeted"));
+                    retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is(""));
+                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
 
                 case 5:
 
-                    user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
+                    CreatedAt = tweetFromFile(1).getString("created_at");
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    usr = tweetFromFile(1).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
 
-                    isRetweet = Boolean.parseBoolean(tweetFromFile(0).getString("retweet_status"));
+                    text = tweetFromFile(1).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(1).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(0).getString("retweeted"));
+                    retweeted = tweetFromFile(1).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is(""));
+                    assertThat(result, is("19 часов назад @havenivor01 retweeted @mckeatingphoto: .@ellmot7 scoring at the kells end again  soon ! @OfficialHavenRl http://t.co/PqbaE0N2506"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
                 case 6:
 
-                    user = tweetFromFile(1).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
+                    CreatedAt = tweetFromFile(0).getString("created_at");
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    CreatedAt = tweetFromFile(1).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
 
-                    isRetweet = Boolean.parseBoolean(tweetFromFile(1).getString("retweet_status"));
+                    text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(1).getString("retweeted"));
+                    retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is(""));
+                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
 
                 case 7:
 
-                    user = tweetFromFile(0).getJSONObject("user").getString("screen_name");
-                    when(tweet.getUser().getName()).thenReturn(user);
-
                     CreatedAt = tweetFromFile(0).getString("created_at");
-                    when(tweet.getCreatedAt().toString()).thenReturn(CreatedAt);
+                    date =  df.parse(CreatedAt);
+                    when(tweet.getCreatedAt()).thenReturn(date);
 
-                    isRetweet = Boolean.parseBoolean(tweetFromFile(0).getString("retweet_status"));
+                    usr = tweetFromFile(0).getJSONObject("user").getString("screen_name");
+                    when(tweet.getUser()).thenReturn(user);
+                    when(user.getName()).thenReturn(usr);
+
+                    text = tweetFromFile(0).getString("text");
+                    when(tweet.getText()).thenReturn(text);
+
+                    isRetweet = tweetFromFile(0).has("retweeted_status");
                     when(tweet.isRetweet()).thenReturn(isRetweet);
+                    when(parser.isHide()).thenReturn(false);
 
-                    retweeted = Integer.parseInt(tweetFromFile(0).getString("retweeted"));
+                    retweeted = tweetFromFile(0).getInt("retweet_count");
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is(""));
+                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;

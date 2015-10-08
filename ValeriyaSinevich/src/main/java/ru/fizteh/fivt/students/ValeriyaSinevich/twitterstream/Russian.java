@@ -10,7 +10,7 @@ public class Russian {
 
     public static String translateMinutes(long diff) {
         if ((DECADE < diff % CHECK && diff % CHECK < DECADE_TWO)
-                || diff % DECADE > SECOND_FORM_BOUND) {
+                || diff % DECADE > SECOND_FORM_BOUND || diff % DECADE == 0) {
             return " минут";
         } else if (diff % DECADE == FIRST_FORM_BOUND && diff % CHECK != EXCEPTION) {
             return " минутy";
@@ -21,7 +21,7 @@ public class Russian {
 
     public static String translateHours(long diff) {
         if ((DECADE < diff % CHECK && diff % CHECK < DECADE_TWO)
-                || diff % DECADE > SECOND_FORM_BOUND) {
+                || diff % DECADE > SECOND_FORM_BOUND || diff % DECADE == 0) {
             return " часов";
         } else if (diff % DECADE == FIRST_FORM_BOUND && diff % CHECK != EXCEPTION) {
             return " час";
@@ -32,7 +32,7 @@ public class Russian {
 
     public static String translateDays(long diff) {
         if ((DECADE < diff % CHECK && diff % CHECK < DECADE_TWO)
-                || diff % DECADE > SECOND_FORM_BOUND) {
+                || diff % DECADE > SECOND_FORM_BOUND || diff % DECADE == 0) {
             return " дней";
         } else if (diff % DECADE == FIRST_FORM_BOUND && diff % CHECK != EXCEPTION) {
             return " день";

@@ -25,10 +25,11 @@ public class Printer {
                 String text = tweet.getText();
                 String[] parts = text.split("RT");
                 parts = parts[1].split(":");
-                result.append(" retweeted "
-                        + parts[0]
-                        + ": "
-                        + parts[1]);
+                result.append(" retweeted"
+                        + parts[0]);
+                for (int i = 1; i < parts.length; ++i) {
+                    result.append(":" + parts[i]);
+                }
             } else {
                 result.append(" : "
                         + tweet.getText());
