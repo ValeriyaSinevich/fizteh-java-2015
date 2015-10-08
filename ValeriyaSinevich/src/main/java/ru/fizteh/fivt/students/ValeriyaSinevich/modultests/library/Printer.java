@@ -34,8 +34,8 @@ public class Printer {
                 result.append(" : "
                         + tweet.getText());
             }
-            if (tweet.isRetweeted()) {
-                result.append(Integer.toString(tweet.getRetweetCount()));
+            if (tweet.getRetweetCount() > 0) {
+                result.append(" retweeted " + Integer.toString(tweet.getRetweetCount()) + " times");
             }
         }
         return result.toString();

@@ -217,7 +217,7 @@ public class PrinterTest {
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
                     result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is("19 часов назад @havenivor01 retweeted @mckeatingphoto: .@ellmot7 scoring at the kells end again  soon ! @OfficialHavenRl http://t.co/PqbaE0N2506"));
+                    assertThat(result, is("19 часов назад @havenivor01 retweeted @mckeatingphoto: .@ellmot7 scoring at the kells end again  soon ! @OfficialHavenRl http://t.co/PqbaE0N250 retweeted 6 times"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
