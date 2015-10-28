@@ -4,7 +4,7 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 import twitter4j.Status;
 
 public class Printer {
-    public static String printTweet(Status tweet, Now now, ParametersParser parser, boolean stream, String substring) {
+    public String printTweet(Status tweet, Now now, ParametersParser parser, boolean stream, String substring) {
         if (!substring.equals("")) {
             if (!(tweet.getText().contains(substring))) {
                 return "";

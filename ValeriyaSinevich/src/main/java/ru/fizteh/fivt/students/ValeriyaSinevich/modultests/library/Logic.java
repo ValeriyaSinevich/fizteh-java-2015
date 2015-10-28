@@ -3,8 +3,7 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 import com.beust.jcommander.JCommander;
 import twitter4j.*;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class Logic {
     private JCommander p1;
@@ -17,14 +16,12 @@ public class Logic {
         querist = quer;
     }
 
-    public final List<String> mainLogic(String[] args) throws Exception {
-        List<String> tweetsToPrint = new LinkedList<>();
+    public final void mainLogic(Consumer<String> consumer) throws Exception {
             if (parser.isHelp()) {
                 p1.usage();
-                return tweetsToPrint;
             } else {
                 try {
-                    return twitterLogic();
+                    twitterLogic(consumer);
                 } catch (Exception ex) {
                     throw new Exception(ex.getMessage());
                 }
@@ -32,8 +29,7 @@ public class Logic {
     }
 
 
-    public final List<String> twitterLogic() throws Exception {
-        List<String> tweetsToPrint = new LinkedList<>();
+    public final void twitterLogic(Consumer<String> consumer) throws Exception {
         double[] coordinates;
         if (parser.getPlace().equals("") || parser.getPlace().equals("nearby")) {
             try {
@@ -53,7 +49,8 @@ public class Logic {
             }
         }
         if (parser.isStream()) {
-            querist.getTwitterStream(coordinates, parser, parser.getSubstring());
+            twitter4j.TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+            querist.getTwitterStream(twitterStream, coordinates, parser, parser.getSubstring(), consumer);
         } else {
             try {
                 //ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -61,15 +58,12 @@ public class Logic {
 
                 //Twitter twitter = new TwitterFactory(cb.build()).getInstance();
                 Twitter twitter = TwitterFactory.getSingleton();
-                String radiusUnit = "km";
-                final double distance = 5;
                 twitter4j.GeoLocation loc = new twitter4j.GeoLocation(coordinates[0], coordinates[1]);
-                return querist.getTweets(twitter, coordinates, parser, parser.getSubstring());
+                querist.getTweets(twitter, coordinates, parser, parser.getSubstring(), consumer);
             } catch (GetTweetException ex) {
                 throw new GetTweetException(ex.getMessage());
             }
         }
-        return tweetsToPrint;
     }
 
 }

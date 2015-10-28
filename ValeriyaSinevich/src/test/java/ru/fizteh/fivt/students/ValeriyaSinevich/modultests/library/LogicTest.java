@@ -8,6 +8,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -28,18 +29,19 @@ public class LogicTest {
         ParametersParser parser = mock(ParametersParser.class);
         JCommander jc = mock(JCommander.class);
         Querist querist = mock(Querist.class);
-        String[] args = {"-s", "-p", "Moscow"};
+
+        List<String> tweets = new LinkedList<>();
 
         when(parser.isHelp()).thenReturn(true);
         Logic logic = new Logic(jc, parser, querist);
-        List<String> result = logic.mainLogic(args);
-        assertThat(result, hasSize(0));
+        logic.mainLogic(tweets::add);
+        assertThat(tweets, hasSize(0));
         verify(jc).usage();
 
         when(parser.isHelp()).thenReturn(false);
         logic = spy(Logic.class);
-        logic.mainLogic(args);
-        verify(logic).twitterLogic();
+        logic.mainLogic(tweets::add);
+        verify(logic).twitterLogic(anyObject());
     }
 
 
@@ -54,6 +56,8 @@ public class LogicTest {
         JCommander jc = new JCommander();
         PropertiesLoader prop = new PropertiesLoader();
 
+        List<String> tweets = new LinkedList<>();
+
         double[] coordinates = {55.755826, 37.6173};
         when(querist.findCoordinates(prop, ch,"Moscow")).thenReturn(coordinates);
         when(querist.findCoordinatesByIp(ch)).thenReturn(coordinates);
@@ -61,34 +65,34 @@ public class LogicTest {
         when(parser.isStream()).thenReturn(true);
         when(parser.getSubstring()).thenReturn("");
         Logic logic = new Logic(jc, parser, querist);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
         verify(querist).findCoordinates(prop, ch,"Moscow");
-        verify(querist).getTwitterStream(coordinates, parser, "");
+        verify(querist).getTwitterStream(anyObject(), coordinates, parser, "", anyObject());
 
         when(parser.isStream()).thenReturn(false);
         logic = new Logic(jc, parser, querist);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
         verify(querist).getTweets(twitter, coordinates, parser, "");
 
         when(querist.findCoordinates(prop, ch,"Moscow")).thenThrow(new LocationException("can't find Location"));
         logic = new Logic(jc, parser, querist);
         thrown.expect(Exception.class);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
 
         when(querist.findCoordinates(prop, ch,"Moscow")).thenThrow(new PropertiesException("can't load key"));
         logic = new Logic(jc, parser, querist);
         thrown.expect(Exception.class);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
 
         when(querist.findCoordinates(prop, ch, "Moscow")).thenReturn(coordinates);
         when(querist.getTweets(twitter, coordinates, parser, "")).thenThrow(new GetTweetException("can't get tweets"));
         logic = new Logic(jc, parser, querist);
         thrown.expect(GetTweetException.class);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
 
         when(parser.getPlace()).thenReturn("");
         logic = new Logic(jc, parser, querist);
-        logic.twitterLogic();
+        logic.twitterLogic(tweets::add);
         verify(querist).findCoordinatesByIp(ch);
         verify(querist).getTweets(twitter, coordinates, parser, "");
     }

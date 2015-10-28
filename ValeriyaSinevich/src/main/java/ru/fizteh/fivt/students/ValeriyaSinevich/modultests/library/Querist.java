@@ -9,6 +9,7 @@ import twitter4j.json.DataObjectFactory;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 public class Querist {
     private static final int MAXCOUNT = 3;
@@ -91,17 +92,19 @@ public class Querist {
         return new double[]{lat, lon};
     }
 
-    public void getTwitterStream(double[] coordinates, ParametersParser parser, String substring) {
+    public void getTwitterStream(TwitterStream twitterStream, double[] coordinates,
+                                 ParametersParser parser, String substring, Consumer<String> listenerOverride) {
         FilterQuery tweetFilterQuery = new FilterQuery();
         double[][] boundingBox = createBox(coordinates[0], coordinates[1]);
         tweetFilterQuery.locations(boundingBox);
-        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+       // TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
         StatusAdapter listener = new StatusAdapter() {
 
             @Override
             public void onStatus(Status status) {
                 Now now = new Now();
-                Printer.printTweet(status, now, parser, true, substring);
+                Printer printer = new Printer();
+                listenerOverride.accept(printer.printTweet(status, now, parser, true, substring));
             }
 
             @Override
@@ -115,8 +118,9 @@ public class Querist {
         twitterStream.filter(tweetFilterQuery);
     }
 
-    public List<String> tweetsDealer(List<Status> tweets, ParametersParser parser, String substring)
+    public void tweetsDealer(List<Status> tweets, ParametersParser parser, String substring, Consumer<String> consumer)
             throws GetTweetException {
+        Printer printer = new Printer();
         if (tweets.size() == 0) {
             throw new GetTweetException("no tweets on the given arguments");
         }
@@ -136,22 +140,18 @@ public class Querist {
            // halva.put(obj);
             //System.out.println(prettyJsonString);
             Now now = new Now();
-            tweetsToPrint.add(Printer.printTweet(tweet, now, parser, false, substring));
+            consumer.accept(printer.printTweet(tweet, now, parser, false, substring));
         }
        // String str = halva.toString();
        // Gson gson = new GsonBuilder().setPrettyPrinting().create();
         //JsonParser jp = new JsonParser();
         //JsonElement je = jp.parse(str);
         //String prettyJsonString = gson.toJson(je);
-
-        return tweetsToPrint;
     }
 
-    public List<String> getTweets(Twitter twitter, double[] coordinates,
-                                  ParametersParser parser, String substring)
+    public void getTweets(Twitter twitter, double[] coordinates,
+                                  ParametersParser parser, String substring, Consumer<String> consumer)
             throws GetTweetException {
-
-        List<String> tweetsToPrint = new LinkedList<>();
 
         int count = MAXCOUNT;
 
@@ -162,8 +162,7 @@ public class Querist {
                 twitter4j.GeoLocation loc = new twitter4j.GeoLocation(coordinates[0], coordinates[1]);
                 QueryResult result = twitter.search(new Query().geoCode(loc, distance, radiusUnit));
                 List<Status> tweets = result.getTweets();
-                tweetsToPrint = tweetsDealer(tweets, parser, substring);
-                return tweetsToPrint;
+                tweetsDealer(tweets, parser, substring, consumer);
             } catch (TwitterException te) {
                 --count;
                 if (count  == 0) {
@@ -171,7 +170,6 @@ public class Querist {
                 }
             }
         }
-        return tweetsToPrint;
     }
 
 }
