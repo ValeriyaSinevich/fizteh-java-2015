@@ -158,12 +158,12 @@ public class Querist {
                 int i;
                 for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
                     Status tweet = tweets.get(i);
-                    String json = DataObjectFactory.getRawJSON(tweet);
+                   /* String json = DataObjectFactory.getRawJSON(tweet);
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonParser jp = new JsonParser();
                     JsonElement je = jp.parse(json);
                     String prettyJsonString = gson.toJson(je);
-                    System.out.println(prettyJsonString);
+                    System.out.println(prettyJsonString);*/
                     Printer.printTweet(tweet, parser, false, substring);
                 }
                 if (i == Integer.min(limits, tweets.size())) {

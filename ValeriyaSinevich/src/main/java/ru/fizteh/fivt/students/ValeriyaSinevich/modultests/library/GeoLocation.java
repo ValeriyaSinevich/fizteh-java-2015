@@ -13,35 +13,35 @@ public final class GeoLocation {
     private static final double MIN_LON = Math.toRadians(-180d); // -PI
     private static final double MAX_LON = Math.toRadians(180d);  //  PI
 
-    private GeoLocation() {
+    public GeoLocation() {
     }
 
     /**
      * @param latitude the latitude, in degrees.
      * @param longitude the longitude, in degrees.
      */
-    public static ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation fromDegrees(double latitude, double longitude) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
-        result.radLat = Math.toRadians(latitude);
-        result.radLon = Math.toRadians(longitude);
-        result.degLat = latitude;
-        result.degLon = longitude;
-        result.checkBounds();
-        return result;
+    public void fromDegrees(double latitude, double longitude) {
+        //ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result
+        // = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
+        radLat = Math.toRadians(latitude);
+        radLon = Math.toRadians(longitude);
+        degLat = latitude;
+        degLon = longitude;
+        checkBounds();
     }
 
     /**
      * @param latitude the latitude, in radians.
      * @param longitude the longitude, in radians.
      */
-    public static ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation fromRadians(double latitude, double longitude) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
-        result.radLat = latitude;
-        result.radLon = longitude;
-        result.degLat = Math.toDegrees(latitude);
-        result.degLon = Math.toDegrees(longitude);
-        result.checkBounds();
-        return result;
+    public void fromRadians(double latitude, double longitude) {
+        //ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation result
+        // = new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
+        radLat = latitude;
+        radLon = longitude;
+        degLat = Math.toDegrees(latitude);
+        degLon = Math.toDegrees(longitude);
+        checkBounds();
     }
 
     private void checkBounds() {
@@ -51,7 +51,8 @@ public final class GeoLocation {
         }
     }
 
-    public ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] boundingCoordinates(double distance, double radius) {
+    public ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[]
+    boundingCoordinates(double distance, double radius) {
         if (radius < 0d || distance < 0d) {
             throw new IllegalArgumentException();
         }
@@ -82,8 +83,12 @@ public final class GeoLocation {
             maxLon = MAX_LON;
         }
 
-        return new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[]{fromRadians(minLat, minLon),
-                fromRadians(maxLat, maxLon)};
+        GeoLocation min = new GeoLocation();
+        GeoLocation max = new GeoLocation();
+        min.fromRadians(minLat, minLon);
+        max.fromRadians(maxLat, maxLon);
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] bounds = {min, max};
+        return bounds;
     }
 
     public double getLatitudeInDegrees() {

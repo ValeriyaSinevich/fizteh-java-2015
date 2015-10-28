@@ -1,0 +1,20 @@
+Usage: <main class> [options]
+  Options:
+    --help, -h
+       help
+       Default: false
+    --hideRetweets
+       hideRetweets
+       Default: false
+    --limit, -l
+       limit
+       Default: 2147483647
+    --place, -p
+       places
+       Default: <empty string>
+    --query, -q
+       substring
+       Default: <empty string>
+    --stream, -s
+       limit
+       Default: false

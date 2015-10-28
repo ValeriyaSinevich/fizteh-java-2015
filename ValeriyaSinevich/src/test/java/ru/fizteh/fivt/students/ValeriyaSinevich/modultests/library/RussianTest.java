@@ -13,57 +13,46 @@ public class RussianTest {
     private static final int TEST_COUNT = 6;
 
     @Test
-    public void testTranslateMinutes() throws Exception {
-        List<String> ans = new ArrayList<String>(0);
+    public void testTranslate() throws Exception {
+        List<String> ans1 = new ArrayList<String>(0);
+        List<String> ans2 = new ArrayList<String>(0);
+        List<String> ans3 = new ArrayList<String>(0);
+
 
         long[] diff = {1, 22, 11, 14, 51, 66};
 
-        ans.add(" минуту");
-        ans.add(" минуты");
-        ans.add(" минут");
-        ans.add(" минут");
-        ans.add(" минуту");
-        ans.add(" минут");
+        ans1.add(" минуту");
+        ans1.add(" минуты");
+        ans1.add(" минут");
+        ans1.add(" минут");
+        ans1.add(" минуту");
+        ans1.add(" минут");
+
+        ans2.add(" час");
+        ans2.add(" часа");
+        ans2.add(" часов");
+        ans2.add(" часов");
+        ans2.add(" час");
+        ans2.add(" часов");
+
+        ans3.add(" день");
+        ans3.add(" дня");
+        ans3.add(" дней");
+        ans3.add(" дней");
+        ans3.add(" день");
+        ans3.add(" дней");
 
         for (int i = 0; i < TEST_COUNT; ++i) {
-            String result = Russian.translateMinutes(diff[i]);
-            assertThat(result, is(ans.get(i)));
+            String result = Russian.translate(diff[i], "m");
+            assertThat(result, is(ans1.get(i)));
         }
-    }
-
-    @Test
-    public void testTranslateHours() throws Exception {
-        List<String> ans = new ArrayList<String>(0);
-        long[] diff = {1, 22, 11, 14, 51, 66};
-
-        ans.add(" час");
-        ans.add(" часа");
-        ans.add(" часов");
-        ans.add(" часов");
-        ans.add(" час");
-        ans.add(" часов");
-
         for (int i = 0; i < TEST_COUNT; ++i) {
-            String result = Russian.translateHours(diff[i]);
-            assertThat(result, is(ans.get(i)));
+            String result = Russian.translate(diff[i], "h");
+            assertThat(result, is(ans2.get(i)));
         }
-    }
-
-    @Test
-    public void testTranslateDays() throws Exception {
-        List<String> ans = new ArrayList<String>(0);
-        long[] diff = {1, 22, 11, 14, 51, 66};
-
-        ans.add(" день");
-        ans.add(" дня");
-        ans.add(" дней");
-        ans.add(" дней");
-        ans.add(" день");
-        ans.add(" дней");
-
         for (int i = 0; i < TEST_COUNT; ++i) {
-            String result = Russian.translateDays(diff[i]);
-            assertThat(result, is(ans.get(i)));
+            String result = Russian.translate(diff[i], "d");
+            assertThat(result, is(ans3.get(i)));
         }
     }
 }

@@ -16,6 +16,8 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +65,12 @@ public class PrinterTest {
 
         for (int i = 0; i < TEST_COUNT; ++i) {
 
+            Now now = mock(Now.class);
+            String str = "2015-10-07 12:30";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+            when(now.getTime()).thenReturn(dateTime);
+
             switch (i) {
                 case 0:
                     isRetweet = tweetFromFile(0).has("retweeted_status");
@@ -84,10 +92,9 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    String result = Printer.printTweet(tweet, parser, false, "nosuchword");
+                    String result = Printer.printTweet(tweet, now, parser, false, "nosuchword");
                     assertThat(result, is(""));
 
-                    //verify(TimeFormatter.formatTime(tweet.getCreatedAt(), now));
                     break;
 
                 case 1:
@@ -110,7 +117,7 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "University");
+                    result = Printer.printTweet(tweet, now, parser, false, "University");
                     assertThat(result, is(""));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
@@ -136,7 +143,7 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, true, "");
+                    result = Printer.printTweet(tweet, now, parser, true, "");
                     assertThat(result, is("@MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
@@ -162,9 +169,9 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "");
+                    result = Printer.printTweet(tweet, now, parser, false, "");
                     assertThat(result,
-                            is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
+                            is("Just now @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
@@ -190,8 +197,8 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
+                    result = Printer.printTweet(tweet, now, parser, false, "");
+                    assertThat(result, is("Just now @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
 
@@ -216,8 +223,8 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is("19 часов назад @havenivor01 retweeted @mckeatingphoto: .@ellmot7 scoring at the kells end again  soon ! @OfficialHavenRl http://t.co/PqbaE0N250 retweeted 6 times"));
+                    result = Printer.printTweet(tweet, now, parser, false, "");
+                    assertThat(result, is("Just now @havenivor01 retweeted @mckeatingphoto: .@ellmot7 scoring at the kells end again  soon ! @OfficialHavenRl http://t.co/PqbaE0N250 retweeted 6 times"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
@@ -242,8 +249,8 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
+                    result = Printer.printTweet(tweet, now, parser, false, "");
+                    assertThat(result, is("Just now @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                    // verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;
@@ -269,8 +276,8 @@ public class PrinterTest {
                     when(tweet.isRetweeted()).thenReturn(retweeted > 0);
                     when(tweet.getRetweetCount()).thenReturn(retweeted);
 
-                    result = Printer.printTweet(tweet, parser, false, "");
-                    assertThat(result, is("22 часа назад @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
+                    result = Printer.printTweet(tweet, now, parser, false, "");
+                    assertThat(result, is("Just now @MariaZelinskay : #pizza @ Plekhanov Russian University of Economics https://t.co/PDxKWvYk5Q"));
 
                     //verify(TimeFormatter.formatTime(tweet.getCreatedAt()));
                     break;

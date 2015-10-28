@@ -1,29 +1,26 @@
 package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
-//import org.apache.http.client.methods.HttpPost;
-
 import twitter4j.*;
-import twitter4j.GeoLocation;
 import twitter4j.TwitterStream;
 
-import java.io.ByteArrayOutputStream;
+import twitter4j.json.DataObjectFactory;
 
-import java.net.URL;
-import java.net.URLConnection;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 public class Querist {
     private static final int MAXCOUNT = 3;
-    private static final int MAX_BYTE_STREAM = 1024;
 
-    public static double[][] createBox(double lat, double lon) {
-        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation point
-                = ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation.fromDegrees(lat, lon);
+    public double[][] createBox(double lat, double lon) {
+        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation geo =
+                new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation();
+        geo.fromDegrees(lat, lon);
         final double radius = 6371.01;
         final double distance = 5;
         ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.GeoLocation[] borders
-                = point.boundingCoordinates(distance, radius);
+                = geo.boundingCoordinates(distance, radius);
         double[][] boundingBox = new double[2][2];
         boundingBox[0][0] = borders[0].getLongitudeInDegrees();
         boundingBox[0][1] = borders[0].getLatitudeInDegrees();
@@ -32,79 +29,61 @@ public class Querist {
         return boundingBox;
     }
 
-    public static double[] findCoordinatesByIp() throws LocationException {
+    public double[] findCoordinatesByIp(ConnectionHandler ch) throws LocationException {
         double lat;
         double lon;
+        String[] loc;
+        String geoUrl = "http://ipinfo.io/json";
         try {
-            URL geoIpUrl = new URL("http://ipinfo.io/json");
-            URLConnection conn = geoIpUrl.openConnection();
-            try (ByteArrayOutputStream output = new ByteArrayOutputStream(MAX_BYTE_STREAM)) {
-                org.apache.commons.io.IOUtils.copy(conn.getInputStream(), output);
-                output.close();
-                String result = output.toString();
-                //System.out.println(result);
-                JSONObject myGeoLocation = new JSONObject(result);
-
-                    /*String myGeoLocationAddr = myGeoLocation.getString("City")
-                            + ", "
-                            + myGeoLocation.getString("region")
-                            + ", "
-                            + myGeoLocation.getString("country");*/
-                String[] loc = myGeoLocation.getString("loc").split(",");
-                //System.out.printf(loc[0]);
-                lat = Double.parseDouble(loc[0]);
-                lon = Double.parseDouble(loc[1]);
+            JSONObject myGeoLocation = ch.returnJsonString(geoUrl);
+            try {
+                loc = myGeoLocation.getString("loc").split(",");
             } catch (Exception ex) {
-                throw new LocationException(ex.getMessage());
+                throw new LocationException("can't find coordinates");
             }
-
-        } catch (Exception ex) {
-            throw new LocationException(ex.getMessage());
+            lat = Double.parseDouble(loc[0]);
+            lon = Double.parseDouble(loc[1]);
+        } catch (LocationException ex) {
+            throw ex;
         }
         double[] coordinates = new double[]{lat, lon};
         return coordinates;
     }
 
-    public static double[] findCoordinates(String name) throws LocationException,
+    public double[] findCoordinates(PropertiesLoader prop, ConnectionHandler ch, String name) throws LocationException,
             ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException {
         double lat, lon;
         String key;
 
         if (name.equals("")) {
-            return findCoordinatesByIp();
+            return findCoordinatesByIp(ch);
         } else {
-            PropertiesLoader prop = new PropertiesLoader();
             try {
-                key = "&key=" + prop.loadKey().split("\"")[1];
+                Properties googleKeys = new Properties();
+                key = "&key=" + prop.loadKey(googleKeys).split("\"")[1];
             } catch (ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException e) {
-                throw new ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException(e.getMessage());
+                throw new
+                        ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library.PropertiesException(e.getMessage());
             }
+            JSONObject geoData;
             String query = "https://maps.googleapis.com/maps/api/geocode/json?address=";
             String finalQuery = query + name + key;
             try {
-                URL url = new URL(finalQuery);
-                URLConnection conn = url.openConnection();
-                try (ByteArrayOutputStream output = new ByteArrayOutputStream(MAX_BYTE_STREAM)) {
-                    org.apache.commons.io.IOUtils.copy(conn.getInputStream(), output);
-                    output.close();
-                    String result = output.toString();
-                    //System.out.println(result);
-                    JSONObject geoData = new JSONObject(result);
-                    if (geoData.getString("status").equals("OK")) {
-                        JSONArray places = geoData.getJSONArray("results");
-
-                        JSONObject place = places.getJSONObject(0);
-                        JSONObject geometry = place.getJSONObject("geometry");
-                        JSONObject location = geometry.getJSONObject("location");
-                        lat = Double.parseDouble(location.getString("lat"));
-                        lon = Double.parseDouble(location.getString("lng"));
+                geoData = ch.returnJsonString(finalQuery);
+            } catch (LocationException ex) {
+                throw ex;
+            }
+            try {
+                if (geoData.getString("status").equals("OK")) {
+                    JSONArray places = geoData.getJSONArray("results");
+                    JSONObject place = places.getJSONObject(0);
+                    JSONObject geometry = place.getJSONObject("geometry");
+                    JSONObject location = geometry.getJSONObject("location");
+                    lat = Double.parseDouble(location.getString("lat"));
+                    lon = Double.parseDouble(location.getString("lng"));
                     } else {
                         throw new LocationException("can't find coordinates");
                     }
-                } catch (Exception ex) {
-                    throw new LocationException(ex.getMessage());
-                }
-
             } catch (Exception ex) {
                 throw new LocationException(ex.getMessage());
             }
@@ -112,7 +91,7 @@ public class Querist {
         return new double[]{lat, lon};
     }
 
-    public static void getTwitterStream(double[] coordinates, ParametersParser parser, String substring) {
+    public void getTwitterStream(double[] coordinates, ParametersParser parser, String substring) {
         FilterQuery tweetFilterQuery = new FilterQuery();
         double[][] boundingBox = createBox(coordinates[0], coordinates[1]);
         tweetFilterQuery.locations(boundingBox);
@@ -121,7 +100,8 @@ public class Querist {
 
             @Override
             public void onStatus(Status status) {
-                Printer.printTweet(status, parser, true, substring);
+                Now now = new Now();
+                Printer.printTweet(status, now, parser, true, substring);
             }
 
             @Override
@@ -135,46 +115,63 @@ public class Querist {
         twitterStream.filter(tweetFilterQuery);
     }
 
-    public static String getTweets(double[] coordinates, ParametersParser parser, String substring)
+    public List<String> tweetsDealer(List<Status> tweets, ParametersParser parser, String substring)
             throws GetTweetException {
-        Twitter twitter = TwitterFactory.getSingleton();
+        if (tweets.size() == 0) {
+            throw new GetTweetException("no tweets on the given arguments");
+        }
+        int limits = parser.getNumber();
+        int i;
+        List<String> tweetsToPrint = new LinkedList<>();
+        //JSONArray halva = new JSONArray();
+        for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
+            Status tweet = tweets.get(i);
+            //String json = DataObjectFactory.getRawJSON(tweet);
+            //JSONObject obj = new JSONObject();
+            //try {
+              //  obj = new JSONObject(json);
+           // } catch (Exception e) {
 
-        String radiusUnit = "km";
-        final double distance = 5;
+           // }
+           // halva.put(obj);
+            //System.out.println(prettyJsonString);
+            Now now = new Now();
+            tweetsToPrint.add(Printer.printTweet(tweet, now, parser, false, substring));
+        }
+       // String str = halva.toString();
+       // Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        //JsonParser jp = new JsonParser();
+        //JsonElement je = jp.parse(str);
+        //String prettyJsonString = gson.toJson(je);
+
+        return tweetsToPrint;
+    }
+
+    public List<String> getTweets(Twitter twitter, double[] coordinates,
+                                  ParametersParser parser, String substring)
+            throws GetTweetException {
+
+        List<String> tweetsToPrint = new LinkedList<>();
 
         int count = MAXCOUNT;
 
         while (count > 0) {
             try {
-                GeoLocation loc = new GeoLocation(coordinates[0], coordinates[1]);
+                String radiusUnit = "km";
+                final double distance = 5;
+                twitter4j.GeoLocation loc = new twitter4j.GeoLocation(coordinates[0], coordinates[1]);
                 QueryResult result = twitter.search(new Query().geoCode(loc, distance, radiusUnit));
                 List<Status> tweets = result.getTweets();
-                if (tweets.size() == 0) {
-                    throw new GetTweetException("no tweets on the given arguments");
-                }
-
-
-                int limits = parser.getNumber();
-                int i;
-                for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
-                    Status tweet = tweets.get(i);
-                    return Printer.printTweet(tweet, parser, false, substring);
-                }
-                if (i == Integer.min(limits, tweets.size())) {
-                    break;
-                }
-
+                tweetsToPrint = tweetsDealer(tweets, parser, substring);
+                return tweetsToPrint;
             } catch (TwitterException te) {
-                te.printStackTrace();
                 --count;
-                //throw new GetTweetException("Failed to search tweets: " + te.getMessage());
+                if (count  == 0) {
+                    throw new GetTweetException("Internet connection is not available");
+                }
             }
         }
-
-        if (count  == 0) {
-            throw new GetTweetException("Internet connection is not available");
-        }
-        return "";
+        return tweetsToPrint;
     }
 
 }
