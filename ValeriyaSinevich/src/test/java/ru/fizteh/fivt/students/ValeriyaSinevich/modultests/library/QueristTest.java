@@ -3,11 +3,14 @@ package ru.fizteh.fivt.students.ValeriyaSinevich.modultests.library;
 
 import org.apache.commons.io.IOUtils;
 
-import org.hamcrest.Matchers;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import twitter4j.JSONObject;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -18,11 +21,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+
 
 import twitter4j.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.*;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 
 public class QueristTest {
@@ -98,13 +108,13 @@ public class QueristTest {
         ConnectionHandler ch = mock(ConnectionHandler.class);
         PropertiesLoader prop = mock(PropertiesLoader.class);
         Properties googleKeys = new Properties();
-        when(prop.loadKey(googleKeys)).thenReturn("AIzaSyB-_tiO6Z9cJusdLmgQoJ_GOAS7lYy3UHU");
+        when(prop.loadKey(googleKeys)).thenReturn("\"AIzaSyB-_tiO6Z9cJusdLmgQoJ_GOAS7lYy3UHU\"");
 
         String finalQuery = "https://maps.googleapis.com/maps/api/geocode/json?address=Moscow&key=AIzaSyB-_tiO6Z9cJusdLmgQoJ_GOAS7lYy3UHU";
         JSONObject s = fromFile(false);
         when(ch.returnJsonString(finalQuery)).thenReturn(s);
         double[] loc = querist.findCoordinates(prop, ch, "Moscow");
-        double[] location = {56.009657, 37.9456611};
+        double[] location = {55.755826, 37.6173};
         assertThat(loc, is(location));
 
         when(ch.returnJsonString(finalQuery)).thenThrow(new LocationException("can't find coordinates"));
@@ -135,7 +145,7 @@ public class QueristTest {
 
     @Test
     public void testGetTwitterStream() throws Exception {
-        twitter4j.TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+        twitter4j.TwitterStream twitterStream = mock(twitter4j.TwitterStream.class);
         //Use ArgumentCaptor to remember argument between different stub invocations
         ArgumentCaptor<StatusListener> statusListener = ArgumentCaptor.forClass(StatusListener.class);
         List<Status> statuses = Twitter4jTestUtils.tweetsFromJson("/mockedTweets.json");
@@ -155,9 +165,9 @@ public class QueristTest {
         querist.getTwitterStream(twitterStream, coordinates, parser, "", tweetsToPrint::add);
         assertThat(tweetsToPrint, hasSize(15));
         assertThat(tweetsToPrint,
-                hasItem("10 часов назад @yulia cosmos : \"- Это водка? - " +
-                                "слабо спросила Маргарита. Кот подпрыгнул на стуле от обиды. - Помилуйте, королева, " +
-                                "-… https://t.co/xGlINIRfPL"
+                hasItem("@yulia cosmos : \"- Это водка? " +
+                                "- слабо спросила Маргарита. Кот подпрыгнул на стуле от обиды.\n - " +
+                                "Помилуйте, королева, -… https://t.co/xGlINIRfPL"
         ));
         verify(twitterStream).addListener((StatusListener) any(StatusAdapter.class));
         verify(twitterStream).filter(any(FilterQuery.class));
@@ -182,31 +192,34 @@ public class QueristTest {
         twitter4j.GeoLocation loc = new twitter4j.GeoLocation(coordinates[0], coordinates[1]);
         QueryResult queryResult = mock(QueryResult.class);
         when(twitter.search(new Query().geoCode(loc, distance, radiusUnit))).thenReturn(queryResult);
-       //doReturn(mockedTweetsToPrint).when(querist).tweetsDealer(argThat(hasSize(15)));
-        doReturn(mockedTweetsToPrint).when(querist).tweetsDealer(anyList(), parser, "", tweetsToPrint::add);
+        doNothing().when(querist).tweetsDealer(any(), any(), any(), any());
+        tweetsToPrint = mockedTweetsToPrint;
+        // doReturn(mockedTweetsToPrint).when(querist).tweetsDealer(anyList(), parser, "", tweetsToPrint::add);
 
         when(queryResult.getTweets()).thenReturn(tweets);
         querist.getTweets(twitter, coordinates,
                 parser, "", tweetsToPrint::add);
         assertThat(tweetsToPrint, hasSize(15));
         assertThat(tweetsToPrint, hasItem(
-                "10 часа назад @Варя : Зато я в 500 злобных карт выиграла\uD83D\uDE08 Ну, я конечно пятая, после парней.. Но у девочек-то выиграла\uD83D\uDE02 @… https://t.co/14gxTXyNcr"));
+                "10 часов назад @Варя : Зато я в 500 злобных карт выиграла\uD83D\uDE08 Ну, я конечно пятая, после парней.. Но у девочек-то выиграла\uD83D\uDE02 @… https://t.co/14gxTXyNcr"));
 
 
         tweets = new LinkedList<>();
         when(queryResult.getTweets()).thenReturn(tweets);
-        doThrow(GetTweetException.class).when(querist).tweetsDealer(anyList(), parser, "", anyObject());
+        doThrow(GetTweetException.class).when(querist).tweetsDealer(any(), any(), any(), any());
         thrown.expect(GetTweetException.class);
         querist.getTweets(twitter, coordinates,
                 parser, "", tweetsToPrint::add);
 
-        when(twitter.search(new Query().geoCode(loc, distance, radiusUnit))).thenThrow(TwitterException.class);
+        when(twitter.search(argThat(hasProperty("geocode", equalTo("55.755826,37.6173,5.0km")))))
+                .thenReturn(queryResult);
+        //when(twitter.search(new Query().geoCode(loc, distance, radiusUnit))).thenThrow(TwitterException.class);
         thrown.expect(GetTweetException.class);
         querist.getTweets(twitter, coordinates,
-                parser, "",tweetsToPrint::add);
+                parser, "", tweetsToPrint::add);
 
-        //when(twitter.search(argThat(hasProperty("geocode"), equalTo("55.755826,37.6173,5.0km"))))
-                //.thenReturn(queryResult);
     }
+
+
 
 }

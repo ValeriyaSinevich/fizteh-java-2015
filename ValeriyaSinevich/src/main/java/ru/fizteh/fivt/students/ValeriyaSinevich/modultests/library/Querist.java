@@ -126,7 +126,6 @@ public class Querist {
         }
         int limits = parser.getNumber();
         int i;
-        List<String> tweetsToPrint = new LinkedList<>();
         //JSONArray halva = new JSONArray();
         for (i = 0; i < Integer.min(limits, tweets.size()); ++i) {
             Status tweet = tweets.get(i);
@@ -163,6 +162,7 @@ public class Querist {
                 QueryResult result = twitter.search(new Query().geoCode(loc, distance, radiusUnit));
                 List<Status> tweets = result.getTweets();
                 tweetsDealer(tweets, parser, substring, consumer);
+                return;
             } catch (TwitterException te) {
                 --count;
                 if (count  == 0) {

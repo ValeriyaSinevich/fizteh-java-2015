@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -23,25 +24,30 @@ public class PropertiesLoaderTest {
     public void testLoadInputStream() throws Exception {
         String s = "/google.properties";
         String wrongS = "abracadabra";
-        PropertiesLoader loader = spy(PropertiesLoader.class);
+        PropertiesLoader loader = new PropertiesLoader();
 
-        loader.loadInputStream(s);
-        verify(loader.getClass());
+        PropertiesLoader loader2 = spy(loader);
 
-        thrown.expect(PropertiesException.class);
-        loader.loadInputStream(wrongS);
+        loader2.loadInputStream(s);
+        verify(loader2).getClass();
+
+        InputStream in = loader.loadInputStream(wrongS);
+        assertThat(in, is(nullValue()));
+
     }
 
     @Test
     public void testLoadKey() throws Exception {
         PropertiesLoader loader = new PropertiesLoader();
-        Properties googleKeys = new Properties();
+        Properties googleKeys = mock(Properties.class);
+        doNothing().when(googleKeys).load(any(InputStream.class));
+        when(googleKeys.getProperty("key")).thenReturn("\"AIzaSyB-_tiO6Z9cJusdLmgQoJ_GOAS7lYy3UHU\"");
         String ans = loader.loadKey(googleKeys);
         assertThat(ans, is("\"AIzaSyB-_tiO6Z9cJusdLmgQoJ_GOAS7lYy3UHU\""));
 
         try (InputStream inputStream
                      = this.getClass().getResourceAsStream("/google.properties")) {
-            doThrow(new IOException()).when(googleKeys).load(inputStream);
+            doThrow(IOException.class).when(googleKeys).load(inputStream);
             thrown.expect(PropertiesException.class);
             loader.loadKey(googleKeys);
         } catch (Exception e) {
@@ -49,7 +55,7 @@ public class PropertiesLoaderTest {
 
         googleKeys = new Properties();
         PropertiesLoader loader2 = spy(loader);
-        doThrow(new Exception()).when(loader2).loadInputStream("/google.properties");
+        doThrow(new PropertiesException("")).when(loader2).loadInputStream(anyString());
         thrown.expect(PropertiesException.class);
         loader2.loadKey(googleKeys);
     }

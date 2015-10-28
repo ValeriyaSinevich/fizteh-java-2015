@@ -28,7 +28,11 @@ public class LogicTest {
     public void testMainLogic() throws Exception {
         ParametersParser parser = mock(ParametersParser.class);
         JCommander jc = mock(JCommander.class);
-        Querist querist = mock(Querist.class);
+        Querist querist = new Querist();
+
+        when(parser.getPlace()).thenReturn("Moscow");
+        when(parser.isStream()).thenReturn(false);
+        when(parser.getSubstring()).thenReturn("");
 
         List<String> tweets = new LinkedList<>();
 
@@ -39,9 +43,9 @@ public class LogicTest {
         verify(jc).usage();
 
         when(parser.isHelp()).thenReturn(false);
-        logic = spy(Logic.class);
-        logic.mainLogic(tweets::add);
-        verify(logic).twitterLogic(anyObject());
+        Logic logic2 = spy(logic);
+        logic2.mainLogic(tweets::add);
+        verify(logic2).twitterLogic(tweets::add);
     }
 
 
@@ -59,33 +63,33 @@ public class LogicTest {
         List<String> tweets = new LinkedList<>();
 
         double[] coordinates = {55.755826, 37.6173};
-        when(querist.findCoordinates(prop, ch,"Moscow")).thenReturn(coordinates);
-        when(querist.findCoordinatesByIp(ch)).thenReturn(coordinates);
+        when(querist.findCoordinates(any(PropertiesLoader.class), any(ConnectionHandler.class), anyString())).thenReturn(coordinates);
+        when(querist.findCoordinatesByIp(any(ConnectionHandler.class))).thenReturn(coordinates);
         when(parser.getPlace()).thenReturn("Moscow");
         when(parser.isStream()).thenReturn(true);
         when(parser.getSubstring()).thenReturn("");
         Logic logic = new Logic(jc, parser, querist);
         logic.twitterLogic(tweets::add);
-        verify(querist).findCoordinates(prop, ch,"Moscow");
-        verify(querist).getTwitterStream(anyObject(), coordinates, parser, "", anyObject());
+        verify(querist).findCoordinates(any(PropertiesLoader.class), any(ConnectionHandler.class), anyString());
+        verify(querist).getTwitterStream(any(twitter4j.TwitterStream.class), any(), any(ParametersParser.class), anyString(), any());
 
         when(parser.isStream()).thenReturn(false);
         logic = new Logic(jc, parser, querist);
         logic.twitterLogic(tweets::add);
-        verify(querist).getTweets(twitter, coordinates, parser, "");
+        verify(querist).getTweets(any(twitter4j.Twitter.class), any(), any(ParametersParser.class), anyString(), any());
 
-        when(querist.findCoordinates(prop, ch,"Moscow")).thenThrow(new LocationException("can't find Location"));
+        when(querist.findCoordinates(any(), any(), any())).thenThrow(new LocationException("can't find Location"));
         logic = new Logic(jc, parser, querist);
         thrown.expect(Exception.class);
         logic.twitterLogic(tweets::add);
 
-        when(querist.findCoordinates(prop, ch,"Moscow")).thenThrow(new PropertiesException("can't load key"));
+        when(querist.findCoordinates(any(), any(), any())).thenThrow(new PropertiesException("can't load key"));
         logic = new Logic(jc, parser, querist);
         thrown.expect(Exception.class);
         logic.twitterLogic(tweets::add);
 
-        when(querist.findCoordinates(prop, ch, "Moscow")).thenReturn(coordinates);
-        when(querist.getTweets(twitter, coordinates, parser, "")).thenThrow(new GetTweetException("can't get tweets"));
+        when(querist.findCoordinates(any(), any(), any())).thenReturn(coordinates);
+        doThrow(new GetTweetException("can't get tweets")).when(querist).getTweets(any(twitter4j.Twitter.class), coordinates, any(ParametersParser.class), anyString(), tweets::add);
         logic = new Logic(jc, parser, querist);
         thrown.expect(GetTweetException.class);
         logic.twitterLogic(tweets::add);
@@ -93,7 +97,7 @@ public class LogicTest {
         when(parser.getPlace()).thenReturn("");
         logic = new Logic(jc, parser, querist);
         logic.twitterLogic(tweets::add);
-        verify(querist).findCoordinatesByIp(ch);
-        verify(querist).getTweets(twitter, coordinates, parser, "");
+        verify(querist).findCoordinatesByIp(any());
+        verify(querist).getTweets(any(twitter4j.Twitter.class), any(), any(ParametersParser.class), anyString(), any());
     }
 }

@@ -16,14 +16,14 @@ public class TwitterStream {
             JCommander p1 = new JCommander(parser, args);
             Logic logic = new Logic(p1, parser, querist);
             try {
-                List<String> tweets = new LinkedList<>();
-                logic.mainLogic(tweets::add);
-                ListIterator<String> listIterator = tweets.listIterator();
+               // List<String> tweets = new LinkedList<>();
+                logic.mainLogic(System.out::println);
+                /*ListIterator<String> listIterator = tweets.listIterator();
                 while (true) {
                     while (listIterator.hasNext()) {
                         System.out.println(listIterator.next());
                     }
-                }
+                }*/
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
             }
