@@ -89,7 +89,8 @@ public class LogicTest {
         logic.twitterLogic(tweets::add);
 
         when(querist.findCoordinates(any(), any(), any())).thenReturn(coordinates);
-        doThrow(new GetTweetException("can't get tweets")).when(querist).getTweets(any(twitter4j.Twitter.class), coordinates, any(ParametersParser.class), anyString(), tweets::add);
+        doThrow(new GetTweetException("can't get tweets")).when(querist).getTweets(any(twitter4j.Twitter.class),
+                coordinates, any(ParametersParser.class), anyString(), tweets::add);
         logic = new Logic(jc, parser, querist);
         thrown.expect(GetTweetException.class);
         logic.twitterLogic(tweets::add);
