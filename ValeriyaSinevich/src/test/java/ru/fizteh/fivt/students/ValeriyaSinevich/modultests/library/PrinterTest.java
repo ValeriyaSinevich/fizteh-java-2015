@@ -49,7 +49,6 @@ public class PrinterTest {
         ParametersParser parser = mock(ParametersParser.class);
         Status tweet = mock(Status.class);
 
-        Date tTweet = mock(Date.class);
         DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss Z yyyy");
 
         User user = mock(User.class);

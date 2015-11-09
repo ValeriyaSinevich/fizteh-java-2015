@@ -26,14 +26,13 @@ public class PropertiesLoaderTest {
         String wrongS = "abracadabra";
         PropertiesLoader loader = new PropertiesLoader();
 
-        PropertiesLoader loader2 = spy(loader);
+        /*PropertiesLoader loader2 = spy(loader);
 
         loader2.loadInputStream(s);
-        verify(loader2).getClass();
+        verify(loader2).getClass();*/
 
         InputStream in = loader.loadInputStream(wrongS);
         assertThat(in, is(nullValue()));
-
     }
 
     @Test
