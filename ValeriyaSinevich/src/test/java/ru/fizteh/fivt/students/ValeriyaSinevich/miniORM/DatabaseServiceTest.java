@@ -31,16 +31,16 @@ public class DatabaseServiceTest {
 
 }
 
-@DatabaseService.Table
+@Table
 class clazz {
-    @DatabaseService.Column
-    @DatabaseService.PrimaryKey
+    @Column
+    @PrimaryKey
     String name;
 
-    @DatabaseService.Column
+    @Column
     String surname;
 
-    @DatabaseService.Column
+    @Column
     int score;
 
     public clazz() {
