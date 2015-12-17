@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl;
+package ru.fizteh.fivt.students.ValeriyaSinevich.CQL;
 
 
 
@@ -7,10 +7,15 @@ import ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl.Functions.Count;
 import ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl.Functions.Max;
 import ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl.Functions.Min;
 
+import java.util.List;
 import java.util.function.Function;
 
 
 public class Aggregates {
+
+    public interface AggregationFunction<T, C> extends Function<T, C> {
+        C apply(List<T> list);
+    }
 
     public static <C, T extends Comparable<T>> Function<C, T> max(Function<C, T> expression) {
         return new Max<>(expression);

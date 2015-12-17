@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl;
+package ru.fizteh.fivt.students.ValeriyaSinevich.CQL;
 import java.lang.reflect.InvocationTargetException;
 
 public interface Query<R> {
