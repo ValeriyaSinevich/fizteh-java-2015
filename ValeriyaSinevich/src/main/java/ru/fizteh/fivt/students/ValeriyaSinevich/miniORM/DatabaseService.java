@@ -139,7 +139,8 @@ public class DatabaseService<T> {
 
         try (Connection connection = getDBConnection()) {
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + tableName
-                    + "" +
+                    + ""
+                    +
                     "(" + createBuilder.toString() + ")");
 
         }
@@ -157,10 +158,9 @@ public class DatabaseService<T> {
             throw new DataBaseException(e.getMessage());
         }
         try {
-            dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER,
-                    DB_PASSWORD);
+            dbConnection = getDBConnection();
             return dbConnection;
-        } catch (SQLException e) {
+        } catch (DataBaseException e) {
             throw new DataBaseException(e.getMessage());
         }
     }
