@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.ValeriyaSinevich.CQL.impl.Functions;
+package ru.fizteh.fivt.students.ValeriyaSinevich.CQL;
 
 import java.util.Comparator;
 import java.util.function.Function;
